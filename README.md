@@ -16,15 +16,15 @@ To run the application, follow these steps:
 ## Dependencies Used
 The following dependencies are used in this project:
 
-- spring-boot-starter-web: Starter package for building web applications with Spring MVC.
-- spring-boot-starter-jdbc: Starter package for using JDBC (Java Database Connectivity) with Spring Boot.
-- spring-boot-starter-websocket: Starter package for WebSocket support in Spring Boot.
-- lombok: Library for reducing boilerplate code in Java classes.
-- spring-boot-starter-test: Starter package for testing Spring Boot applications.
-- gson: Library for working with JSON data in Java.
-- postgresql: JDBC driver for PostgreSQL database.
-- spring-security-crypto: Library for cryptographic operations in Spring Security.
-- spring-boot-starter-data-jpa: Starter package for using Spring Data JPA with Spring Boot.
+- **spring-boot-starter-web**: Starter package for building web applications with Spring MVC.
+- **spring-boot-starter-jdbc**: Starter package for using JDBC (Java Database Connectivity) with Spring Boot.
+- **spring-boot-starter-websocket**: Starter package for WebSocket support in Spring Boot.
+- **lombok**: Library for reducing boilerplate code in Java classes.
+- **spring-boot-starter-test**: Starter package for testing Spring Boot applications.
+- **gson**: Library for working with JSON data in Java.
+- **postgresql**: JDBC driver for PostgreSQL database.
+- **spring-security-crypto**: Library for cryptographic operations in Spring Security.
+- **spring-boot-starter-data-jpa**: Starter package for using Spring Data JPA with Spring Boot.
 
 ### Author
 [Oskar Pedosk](https://github.com/oskarpedosk)
