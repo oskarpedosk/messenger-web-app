@@ -11,6 +11,7 @@ let messageArea = document.querySelector('#messageArea')
 let connectingElement = document.querySelector('.connecting')
 
 let stompClient = null
+let username
 
 let colors = [
     '#2196F3', '#32c787', '#00BCD4', '#ff5652',
@@ -18,7 +19,7 @@ let colors = [
 ]
 
 function register(event) {
-    let username = document.querySelector('#registerUsername').value
+    username = document.querySelector('#registerUsername').value
     let password = document.querySelector('#registerPassword').value
     let passwordConfirm = document.querySelector('#registerPasswordConfirm').value
 
@@ -57,7 +58,7 @@ function register(event) {
 }
 
 function login(event) {
-    let username = document.querySelector('#loginUsername').value
+    username = document.querySelector('#loginUsername').value
     let password = document.querySelector('#loginPassword').value
 
     if (!username) {
@@ -79,7 +80,7 @@ function login(event) {
             .then(data => {
                 if (data.code === 200) {
                     console.log(data)
-                    connectMessengerWS(username)
+                    connectMessengerWS()
                 } else {
                     console.log(data.message)
                 }
@@ -91,7 +92,7 @@ function login(event) {
     event.preventDefault()
 }
 
-function connectMessengerWS(username) {
+function connectMessengerWS() {
     loginPage.classList.add('hidden')
     registerPage.classList.add('hidden')
     messengerPage.classList.remove('hidden')
@@ -99,19 +100,16 @@ function connectMessengerWS(username) {
     let socket = new SockJS('/ws')
     stompClient = Stomp.over(socket)
 
-    stompClient.connect({}, function () {
-        onConnected(username)
-    }, onError)
+    stompClient.connect({}, onConnected, onError)
 }
 
 
-function onConnected(username) {
-    // Subscribe to the Public Topic
+function onConnected() {
     stompClient.subscribe('/topic/public', onMessageReceived)
 
-    stompClient.send("/app/chat.addUser",
+    stompClient.send("/app/chat.login",
         {},
-        JSON.stringify({sender: username, type: 'LOGIN'})
+        JSON.stringify({username: username, type: 'LOGIN'})
     )
 
     connectingElement.classList.add('hidden')
@@ -131,7 +129,7 @@ function sendMessage(event) {
         let chatMessage = {
             sender: username,
             content: messageInput.value,
-            type: 'CHAT'
+            type: 'MESSAGE'
         }
         stompClient.send("/app/messenger.sendMessage", {}, JSON.stringify(chatMessage))
         messageInput.value = ''

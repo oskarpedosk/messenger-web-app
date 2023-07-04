@@ -1,0 +1,2 @@
+INSERT INTO users (id, username, password, joined) VALUES (1, 'kenno', '$2y$10$S3ZaNbdsuanUiAmfEWTVdOsBGf9N/q.mmhDIxc8XGY1SWtN86/t7O', CURRENT_TIMESTAMP);
+INSERT INTO users (id, username, password, joined) VALUES (2, 'admin', '$2y$10$S3ZaNbdsuanUiAmfEWTVdOsBGf9N/q.mmhDIxc8XGY1SWtN86/t7O', CURRENT_TIMESTAMP);

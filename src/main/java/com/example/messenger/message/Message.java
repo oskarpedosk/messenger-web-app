@@ -1,4 +1,4 @@
-package com.example.messenger.model;
+package com.example.messenger.message;
 
 import lombok.*;
 
@@ -7,9 +7,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MessengerMessage {
+public class Message {
     private String content;
     private String sender;
     private String recipient;
-    private MessageType type;
+    private Action action;
 }

@@ -3,6 +3,8 @@ package com.example.messenger.user;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -26,10 +28,12 @@ public class User {
     private String password;
     @Transient
     private String passwordConfirm;
+    private LocalDateTime joined;
 
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+        this.joined = LocalDateTime.now();
     }
 
     @Override
@@ -39,6 +43,7 @@ public class User {
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", passwordConfirm='" + passwordConfirm + '\'' +
+                ", joined=" + joined +
                 '}';
     }
 }

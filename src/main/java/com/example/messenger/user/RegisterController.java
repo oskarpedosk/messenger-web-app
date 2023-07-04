@@ -1,22 +1,18 @@
 package com.example.messenger.user;
 
+import com.example.messenger.exception.ApiError;
 import com.google.gson.Gson;
-import com.example.messenger.user.User;
+import jakarta.servlet.http.HttpServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@RequestMapping(path = "/register")
 public class RegisterController {
 
     private final UserService userService;
@@ -26,7 +22,7 @@ public class RegisterController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    @PostMapping
     public ResponseEntity<String> register(@RequestBody User user) {
 
         Gson gson = new Gson();
@@ -39,17 +35,17 @@ public class RegisterController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(gson.toJson(responseMap));
         }
 
-        boolean newUser = userService.registerUser(user.getUsername(), user.getPassword());
+        boolean newUserCreated = userService.registerUser(user.getUsername(), user.getPassword());
 
-        if (newUser) {
+        if (newUserCreated) {
             responseMap.put("code", 201);
             responseMap.put("username", user.getUsername());
             responseMap.put("message", "Registration successful!");
             return ResponseEntity.status(HttpStatus.CREATED).body(gson.toJson(responseMap));
-        } else {
-            responseMap.put("code", 400);
-            responseMap.put("message", "Username already exists");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(gson.toJson(responseMap));
         }
+
+        responseMap.put("code", 400);
+        responseMap.put("message", "Username already exists");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(gson.toJson(responseMap));
     }
 }

@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -17,13 +19,13 @@ public class UserService {
     }
 
     public boolean authenticate(String username, String password) {
-        User user = userRepository.findByUsername(username);
-        return user != null && passwordEncoder.matches(password, user.getPassword());
+        Optional<User> userOptional = userRepository.findUserByUsername(username);
+        return userOptional.filter(value -> passwordEncoder.matches(password, value.getPassword())).isPresent();
     }
 
     public boolean usernameExists(String username) {
-        User user = userRepository.findByUsername(username);
-        return user != null;
+        Optional<User> userOptional = userRepository.findUserByUsername(username);
+        return userOptional.isPresent();
     }
 
     public boolean registerUser(String username, String password) {

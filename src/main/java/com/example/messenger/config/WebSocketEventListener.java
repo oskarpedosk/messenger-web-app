@@ -1,7 +1,7 @@
 package com.example.messenger.config;
 
-import com.example.messenger.model.MessageType;
-import com.example.messenger.model.MessengerMessage;
+import com.example.messenger.message.Action;
+import com.example.messenger.message.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -25,11 +25,11 @@ public class WebSocketEventListener {
         String username = (String) headerAccessor.getSessionAttributes().get("username");
         if (username != null) {
             log.info("User disconnected: {}", username);
-            var messengerMessage = MessengerMessage. builder()
-                    .type(MessageType.DISCONNECT)
+            var message = Message.builder()
+                    .action(Action.DISCONNECT)
                     .sender(username)
                     .build();
-            messageTemplate.convertAndSend("/topic/public", messengerMessage);
+            messageTemplate.convertAndSend("/topic/public", message);
         }
     }
 }
