@@ -23,23 +23,23 @@ public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/chat.sendMessage")
-    public void sendMessage(@Payload Message message) throws InterruptedException {
-        try {
-            String sessionId = clients.get(message.getRecipient());
-            log.info("Sending message to sessionId: {}", sessionId);
-            messagingTemplate.convertAndSend("/private" + "-user" + sessionId, message);
-        } catch (Exception e) {
-            log.error("error sending message: ", e);
-        }
+    public void sendMessage(@Payload Message message) {
+        String sessionId = clients.get(message.getRecipient());
+
+        // TODO Add message to database
+
+        messagingTemplate.convertAndSend("/private" + "-user" + sessionId, message);
     }
 
     @MessageMapping("/chat.login")
     public void login(@Payload User user, SimpMessageHeaderAccessor headerAccessor) {
         headerAccessor.getSessionAttributes().put("username", user.getUsername());
         clients.put(user.getUsername(), headerAccessor.getSessionId());
-        var message = new Message();
-        message.setContent(user.getUsername() + " logged in!");
-        message.setAction(Action.LOGIN);
+        log.info("User logged in: {}", user.getUsername());
+        var message = Message.builder()
+                .action(Action.LOGIN)
+                .sender(user.getUsername())
+                .build();
         messagingTemplate.convertAndSend("/all/notifications", message);
     }
 }
