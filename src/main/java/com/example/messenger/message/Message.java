@@ -12,4 +12,14 @@ public class Message {
     private String sender;
     private String recipient;
     private Action action;
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "content='" + content + '\'' +
+                ", sender='" + sender + '\'' +
+                ", recipient='" + recipient + '\'' +
+                ", action=" + action +
+                '}';
+    }
 }

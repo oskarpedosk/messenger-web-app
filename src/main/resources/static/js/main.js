@@ -7,11 +7,14 @@ let loginForm = document.querySelector('#loginForm')
 let registerForm = document.querySelector('#registerForm')
 let messageForm = document.querySelector('#messageForm')
 let messageInput = document.querySelector('#messageInput')
+let recipientInput = document.querySelector('#recipientInput')
 let messageArea = document.querySelector('#messageArea')
 let connectingElement = document.querySelector('.connecting')
 
-let stompClient = null
 let username
+let sessionId
+let stompClient
+let privateStompClient
 
 let colors = [
     '#2196F3', '#32c787', '#00BCD4', '#ff5652',
@@ -99,22 +102,28 @@ function connectMessengerWS() {
 
     let socket = new SockJS('/ws')
     stompClient = Stomp.over(socket)
+    stompClient.connect({}, function () {
+        stompClient.subscribe('/all/notifications', function (result) {
+            onMessage(JSON.parse(result.body))
+        })
+    }, onError)
 
-    stompClient.connect({}, onConnected, onError)
-}
-
-
-function onConnected() {
-    stompClient.subscribe('/topic/public', onMessageReceived)
-
-    stompClient.send("/app/chat.login",
-        {},
-        JSON.stringify({username: username, type: 'LOGIN'})
-    )
+    socket = new SockJS('/ws')
+    privateStompClient = Stomp.over(socket)
+    privateStompClient.connect({}, function () {
+        let url = privateStompClient.ws._transport.url;
+        url = url.replace(/^ws:\/\/localhost:8080\/ws\/\d+\//, "");
+        url = url.replace(/\/websocket$/, "");
+        console.log("Your current session is: " + url);
+        sessionId = url;
+        privateStompClient.subscribe('/private-user' + sessionId, function (result) {
+            onMessage(JSON.parse(result.body))
+        })
+        privateStompClient.send("/app/chat.login", {}, JSON.stringify({username: username}))
+    }, onError)
 
     connectingElement.classList.add('hidden')
 }
-
 
 function onError(error) {
     console.log(error)
@@ -125,58 +134,58 @@ function onError(error) {
 
 function sendMessage(event) {
     let messageContent = messageInput.value.trim()
+    let recipient = recipientInput.value
     if (messageContent && stompClient) {
         let chatMessage = {
             sender: username,
+            recipient: recipient,
             content: messageInput.value,
-            type: 'MESSAGE'
+            action: 'MESSAGE'
         }
-        stompClient.send("/app/messenger.sendMessage", {}, JSON.stringify(chatMessage))
+        stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage))
         messageInput.value = ''
     }
     event.preventDefault()
 }
 
 
-function onMessageReceived(payload) {
-    let message = JSON.parse(payload.body)
-
+function onMessage(payload) {
     let messageElement = document.createElement('li')
 
     console.log(payload)
 
-    if (message.type === 'LOGIN') {
-        messageElement.classList.add('event-message')
-        message.content = message.sender + ' joined!'
-    } else if (message.type === 'REGISTER') {
-        console.log("register dude")
-    } else if (message.type === 'DISCONNECT') {
-        messageElement.classList.add('event-message')
-        message.content = message.sender + ' left!'
-    } else {
-        messageElement.classList.add('messenger-message')
-
-        let avatarElement = document.createElement('i')
-        let avatarText = document.createTextNode(message.sender[0])
-        avatarElement.appendChild(avatarText)
-        avatarElement.style['background-color'] = getAvatarColor(message.sender)
-
-        messageElement.appendChild(avatarElement)
-
-        let usernameElement = document.createElement('span')
-        let usernameText = document.createTextNode(message.sender)
-        usernameElement.appendChild(usernameText)
-        messageElement.appendChild(usernameElement)
-    }
-
-    let textElement = document.createElement('p')
-    let messageText = document.createTextNode(message.content)
-    textElement.appendChild(messageText)
-
-    messageElement.appendChild(textElement)
-
-    messageArea.appendChild(messageElement)
-    messageArea.scrollTop = messageArea.scrollHeight
+    // if (data.action === 'LOGIN') {
+    //     messageElement.classList.add('event-message')
+    //     message.content = message.sender + ' joined!'
+    // } else if (message.action === 'REGISTER') {
+    //     console.log("register dude")
+    // } else if (message.action === 'DISCONNECT') {
+    //     messageElement.classList.add('event-message')
+    //     message.content = message.sender + ' left!'
+    // } else {
+    //     messageElement.classList.add('messenger-message')
+    //
+    //     let avatarElement = document.createElement('i')
+    //     let avatarText = document.createTextNode(message.sender[0])
+    //     avatarElement.appendChild(avatarText)
+    //     avatarElement.style['background-color'] = getAvatarColor(message.sender)
+    //
+    //     messageElement.appendChild(avatarElement)
+    //
+    //     let usernameElement = document.createElement('span')
+    //     let usernameText = document.createTextNode(message.sender)
+    //     usernameElement.appendChild(usernameText)
+    //     messageElement.appendChild(usernameElement)
+    // }
+    //
+    // let textElement = document.createElement('p')
+    // let messageText = document.createTextNode(message.content)
+    // textElement.appendChild(messageText)
+    //
+    // messageElement.appendChild(textElement)
+    //
+    // messageArea.appendChild(messageElement)
+    // messageArea.scrollTop = messageArea.scrollHeight
 }
 
 

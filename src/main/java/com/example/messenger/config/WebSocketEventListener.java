@@ -18,9 +18,7 @@ public class WebSocketEventListener {
     private final SimpMessageSendingOperations messageTemplate;
 
     @EventListener
-    public void HandleWebSocketDisconnectListener(
-            SessionDisconnectEvent event
-    ) {
+    public void HandleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String username = (String) headerAccessor.getSessionAttributes().get("username");
         if (username != null) {
@@ -29,7 +27,7 @@ public class WebSocketEventListener {
                     .action(Action.DISCONNECT)
                     .sender(username)
                     .build();
-            messageTemplate.convertAndSend("/topic/public", message);
+            messageTemplate.convertAndSend("/all/notifications", message);
         }
     }
 }
